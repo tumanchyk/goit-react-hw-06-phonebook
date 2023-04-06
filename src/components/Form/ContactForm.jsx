@@ -1,8 +1,11 @@
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from "react-redux";
 import { nanoid } from 'nanoid';
+import { addContact } from "redux/concactSlice.js";
 import { Formik} from 'formik';
 import { FormEl, Label, Input, Button, ErrorMessage } from "./Form.styled";
 import * as yup from 'yup';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
 
 const schema = yup.object().shape({
     name: yup.string().min(2).max(20).required(),
@@ -14,12 +17,25 @@ const initialValues = {
     number: '',
 }
 
-export const ContactForm = ({onSubmit}) =>{
-        const handleSubmit = (values, actions) => {
-            onSubmit({
-                ...values,
-                id: nanoid(7),
-              });
+export default function ContactForm(){
+    const contacts = useSelector (state => state.contacts.list)
+    const dispatch = useDispatch();
+  
+    const onFormSubmit = ( contact ) =>{
+      const someName = contacts.filter(item=> 
+        contact.name.toLowerCase() === item.name.toLowerCase())
+      if(someName.length === 1){
+        Notify.failure(`${contact.name} is already in contacts.`);
+       return;
+      }
+      dispatch(addContact(contact));
+    }
+
+    const handleSubmit = (values, actions) => {
+        onFormSubmit({
+            ...values,
+            id: nanoid(7),
+            });
        actions.resetForm();
     }
         return (
@@ -48,9 +64,5 @@ export const ContactForm = ({onSubmit}) =>{
             </FormEl>
             </Formik>
         )
-      }
-
-      ContactForm.propTypes ={
-        onSubmit: PropTypes.func.isRequired,
       }
 
