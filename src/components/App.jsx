@@ -6,16 +6,16 @@ import ContactList from "./ContactsList/ContactsList.jsx";
 import Filter from "./Filter/Filter.jsx";
 import { addContact, removeContact } from "redux/concactSlice.js";
 import { setValue } from "redux/filterSlice.js";
-import { myContacts } from "redux/concactSlice.js";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 function App (){
-  const contacts = useSelector (myContacts)
+  const contacts = useSelector (state => state.contacts.list)
   const filter = useSelector (state => state.filter);
   const dispatch = useDispatch();
 
   function onFormSubmit( contact ){
-    const someName = contacts.filter(item=> contact.name.toLowerCase() === item.name.toLowerCase())
+    const someName = contacts.filter(item=> 
+      contact.name.toLowerCase() === item.name.toLowerCase())
     if(someName.length === 1){
       Notify.failure(`${contact.name} is already in contacts.`);
      return;
@@ -33,7 +33,8 @@ function App (){
 
   const findContact = () => {
     if(!contacts) return
-     return contacts.filter(contact => contact.name.toLowerCase().includes(filter.toLowerCase()))
+     return contacts.filter(contact => 
+      contact.name.toLowerCase().includes(filter.toLowerCase()))
      
   }
     const foundContacts = findContact()
